@@ -1,5 +1,4 @@
 import { hydrateRoot, type Root } from "react-dom/client";
-import ws from 'ws';
 
 let root: Root | null = null;
 

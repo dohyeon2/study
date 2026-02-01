@@ -2,23 +2,29 @@ import { build } from "esbuild";
 import { watch } from "node:fs";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { WebSocketServer } from "ws";
+import { bundleVendor } from "./src/server/vendor";
 
 
 const buildBundles = async () => {
     try {
+        await bundleVendor();
         await build({
             entryPoints: ['./src/client/bootstrap.tsx'],
-            outfile: './dist/bootstrap.js',
+            outdir: './dist/',
             bundle: true,
             format: 'esm',
+            jsx: 'automatic',
             sourcemap: true,
+            packages: 'external',
         });
         await build({
             entryPoints: ['./src/client/main.tsx'],
-            outfile: './dist/main.js',
+            outdir: './dist/',
             bundle: true,
             format: 'esm',
+            jsx: 'automatic',
             sourcemap: true,
+            packages: 'external',
         });
     } catch (error) {
         console.error(error);
