@@ -26,18 +26,24 @@ export const HomePage: React.FC = () => {
             <form action={(formData) => {
                 setIsPending(true);
                 toast.promise(async () => {
-                    const result = await fileMultiPartUploadAction(formData);
                     const file = formData.get('file') as File;
                     if (!file) {
                         throw new Error('File not selected');
                     }
+                    const result = await fileMultiPartUploadAction({
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                    });
 
-                    const splitParts = Math.ceil(file.size / 1024 / 1024 / 5);
+                    const chunkSize = 1024 * 512;
+
+                    const splitParts = Math.ceil(file.size / chunkSize);
                     if (!result.success) {
                         throw new Error('Upload failed');
                     }
                     for (let i = 0; i < splitParts; i++) {
-                        const part = file.slice(i * 1024 * 1024 * 5, (i + 1) * 1024 * 1024 * 5);
+                        const part = file.slice(i * chunkSize, (i + 1) * chunkSize);
                         const data = new FormData();
                         data.append('file', part);
                         data.append('key', result.key || '');
